@@ -20,7 +20,7 @@ from submodules.model import *
 reshape_size = (224,224)
 task = 'is_damage' #'which_pose'
 mode = 'train'
-env = 'ubuntu'
+env = 'mac'
 model_type = 'inception_v3' #vgg_16, resnet_50, xception, inception_v3
 
 img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
@@ -106,12 +106,13 @@ def read_label(label_dir_path, task):
                 print('>> No Labels are parsed!')
     
     label_container = np.asarray(label_container)
+    print(np.unique(label_container))    
     print(label_container.shape)
     return label_container
 
 # 0. read image and labels
 images = read_img(img_dir_path)
-labels = read_label(label_dir_path, 'which_pose')
+labels = read_label(label_dir_path, is_damage)
 print('>> Images are: ', images.shape)
 print('>> Labels are: ', labels.shape)
 
