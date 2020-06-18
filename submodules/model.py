@@ -1,7 +1,7 @@
 import keras
 
 from keras import models, layers
-from keras.applications import VGG16
+from keras.applications import VGG16, ResNet50, Xception, InceptionV3
 from keras import Input
 from keras.models import Model
 from keras.preprocessing.image import ImageDataGenerator
@@ -22,7 +22,7 @@ import math
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
-def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_class, epoch, batch_size, model_type='vgg16'):
+def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_class, epoch, batch_size, model_type, reshape_size):
 
     print(train_x.shape)
     print(type(train_x))
@@ -38,24 +38,55 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
         pre_trained = VGG16(
             weights='imagenet',
             include_top=False, # True if we want to add Fully Connected Layer at the Last (False)
-            input_shape=(250, 250, 3)
+            input_shape=reshape_size
         )
         pre_trained.trainable = False  # False if we want to freeze the weight
-        #pre_trained.summary()
 
+    elif model_type == 'resnet_50':
+        pre_trained = ResNet50(
+            weights='imagenet'
+        )
+
+    elif model_type == 'xception':
+        pre_trained = Xception(
+            weights='imagenet',
+            include_top=False,
+            input_shape=reshape_size + (3,)
+        )
+
+    elif model_type == 'inception_v3':
+        pre_trained = InceptionV3(
+            weights='imagenet',
+            include_top=False,
+            input_shape=reshape_size + (3,)
+        )
+
+    elif model_type == 'mobilenet_v2':
+        pre_trained = MobileNetV2(
+            weights='imagenet',
+            include_top=False,
+            input_shape=reshape_size + (3,)
+        )
+
+    pre_trained.summary()
     # Add Fine-Tuning Layers
     finetune_model = models.Sequential()
     finetune_model.add(pre_trained)
     
-    finetune_model.add(layers.Flatten())
-    finetune_model.add(layers.Dense(4096, activation='relu'))
-    finetune_model.add(layers.Dense(2048, activation='relu'))
-    finetune_model.add(layers.Dense(1024, activation='relu'))
-    finetune_model.add(layers.Dense(512, activation='relu'))
-    finetune_model.add(layers.Dense(256, activation='relu'))
+    if model_type == 'resnet_50':
+        pass
+
+    else:
+        finetune_model.add(layers.Flatten())
+
+    finetune_model.add(layers.Dense(num_class*128, activation='relu'))
+    finetune_model.add(layers.Dense(num_class*64, activation='relu'))
+    finetune_model.add(layers.Dense(num_class*32, activation='relu'))
+    finetune_model.add(layers.Dense(num_class*16, activation='relu'))
+    finetune_model.add(layers.Dense(num_class*8, activation='relu'))
     finetune_model.add(layers.Dense(num_class, activation='softmax')) # Final Activation
 
-    #finetune_model.summary()
+    finetune_model.summary()
 
     # Compile
     finetune_model.compile(

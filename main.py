@@ -18,8 +18,9 @@ from submodules.model import *
 '''
 img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
 label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
-
+reshape_size = (224,224)
 mode = 'train'
+model_type = 'mobilenet_v2' #vgg_16, resnet_50, xception, inception_v3
 
 # img - label pair checker
 def dataset_pair_checker(img_dir_path, label_dir_path):
@@ -46,7 +47,7 @@ def dataset_pair_checker(img_dir_path, label_dir_path):
 def read_img(img_dir_path):
     
     img_container = list()
-    img_file_names = os.listdir(img_dir_path)[:200]
+    img_file_names = os.listdir(img_dir_path)
 
     idx = 0
     for img_file_name in img_file_names:
@@ -55,7 +56,7 @@ def read_img(img_dir_path):
         img = cv2.imread(os.path.join(img_dir_path, img_file_name))[:,:,::-1] #read as RGB
 
         #image resizing
-        resized_img = cv2.resize(img, dsize=(250,250), interpolation=cv2.INTER_CUBIC)
+        resized_img = cv2.resize(img, dsize=reshape_size, interpolation=cv2.INTER_CUBIC)
 
         img_container.append(resized_img)
 
@@ -73,7 +74,7 @@ def read_label(label_dir_path, task):
 
     label_container = list()
 
-    label_file_names = os.listdir(label_dir_path)[:200]
+    label_file_names = os.listdir(label_dir_path)
 
     for label_file_name in label_file_names: # iterate every files
 
@@ -122,8 +123,10 @@ if mode == 'train':
         train_x, train_y, val_x, val_y, test_x, test_y,
         num_class = 6,
         epoch=10,
-        batch_size=100
-    )    
+        batch_size=100,
+        model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2
+        reshape_size=reshape_size
+    )
 
 
 
