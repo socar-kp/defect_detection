@@ -38,7 +38,7 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
         pre_trained = VGG16(
             weights='imagenet',
             include_top=False, # True if we want to add Fully Connected Layer at the Last (False)
-            input_shape=reshape_size
+            input_shape=reshape_size + (3,)
         )
         pre_trained.trainable = False  # False if we want to freeze the weight
 
@@ -61,14 +61,7 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
             input_shape=reshape_size + (3,)
         )
 
-    elif model_type == 'mobilenet_v2':
-        pre_trained = MobileNetV2(
-            weights='imagenet',
-            include_top=False,
-            input_shape=reshape_size + (3,)
-        )
-
-    pre_trained.summary()
+    #pre_trained.summary()
     # Add Fine-Tuning Layers
     finetune_model = models.Sequential()
     finetune_model.add(pre_trained)
@@ -104,7 +97,7 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     )
 
     # Test Performance
-    y_pred = finetune_model(test_x) #np.argmax
+    y_pred = finetune_model.predict(test_x) #np.argmax
     print(y_pred)
     print(type(y_pred))
 

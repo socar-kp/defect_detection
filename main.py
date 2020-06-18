@@ -18,9 +18,10 @@ from submodules.model import *
 '''
 
 reshape_size = (224,224)
+task = 'is_damage' #'which_pose'
 mode = 'train'
 env = 'ubuntu'
-model_type = 'mobilenet_v2' #vgg_16, resnet_50, xception, inception_v3
+model_type = 'inception_v3' #vgg_16, resnet_50, xception, inception_v3
 
 img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
 label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
@@ -60,7 +61,7 @@ def read_img(img_dir_path):
     for img_file_name in img_file_names:
         
         #read image
-        img = cv2.imread(os.path.join(img_dir_path, img_file_name))[:,:,::-1] #read as RGB
+        img = cv2.imread(os.path.join(img_dir_path, img_file_name))[:,:,::-1]/255 #read as RGB
 
         #image resizing
         resized_img = cv2.resize(img, dsize=reshape_size, interpolation=cv2.INTER_CUBIC)
@@ -126,14 +127,26 @@ print('test_x: ', test_x.shape)
 
 #1. Train Mode?
 if mode == 'train':
-    classifier = transfer_learning_model(
-        train_x, train_y, val_x, val_y, test_x, test_y,
-        num_class = 6,
-        epoch=10,
-        batch_size=100,
-        model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2
-        reshape_size=reshape_size
-    )
+
+    if task == 'is_damage':
+        classifier = transfer_learning_model(
+            train_x, train_y, val_x, val_y, test_x, test_y,
+            num_class = 2,
+            epoch=10,
+            batch_size=100,
+            model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2
+            reshape_size=reshape_size
+        )
+
+    elif task == 'which_pose':
+        classifier = transfer_learning_model(
+            train_x, train_y, val_x, val_y, test_x, test_y,
+            num_class = 6,
+            epoch=10,
+            batch_size=100,
+            model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2
+            reshape_size=reshape_size
+        )
 
 
 
