@@ -89,7 +89,13 @@ def read_label(label_dir_path, task):
         with open(os.path.join(label_dir_path, label_file_name), 'r') as f:
             label_dict = json.load(f)
 
-            if task == 'which_pose':
+            if task == 'is_damage':
+                label = label_dict['damage']
+                label = int(label)
+
+                label_container.append(label)
+
+            elif task == 'which_pose':
                 label = label_dict['picture_position'] # label in str
                 label = int(label) # transform str label into int
 
