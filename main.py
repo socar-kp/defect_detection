@@ -16,11 +16,18 @@ from submodules.model import *
 * number of imgs = 2000 (.DS_Store --> erased)
 * number of labels = 2000
 '''
-img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
-label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
+
 reshape_size = (224,224)
 mode = 'train'
+env = 'ubuntu'
 model_type = 'mobilenet_v2' #vgg_16, resnet_50, xception, inception_v3
+
+img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
+label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
+
+if env == 'ubuntu':
+    img_dir_path = './damaged_car_images/' #path of the image
+    label_dir_path = './bbox_labels/' #path of the label
 
 # img - label pair checker
 def dataset_pair_checker(img_dir_path, label_dir_path):
