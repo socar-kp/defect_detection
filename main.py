@@ -18,20 +18,53 @@ from submodules.model import *
 '''
 
 reshape_size = (224,224)
-task = 'is_damage' #'which_pose'
+task = 'which_pose' #'which_pose'
 mode = 'train'
-env = 'mac'
-model_type = 'inception_v3' #vgg_16, resnet_50, xception, inception_v3
+env = 'ubuntu'
+model_type = 'vgg16' #vgg16, resnet_50, xception, inception_v3
+dataset_type = 'neokt' #socar
 
-img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
-label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
+print('>> Task: ', task)
+print('>> Model Type: ', model_type)
+print('>> Dataset: ', dataset_type)
 
-if env == 'ubuntu':
-    img_dir_path = './damaged_car_images/' #path of the image
-    label_dir_path = './bbox_labels/' #path of the label
+if dataset_type == 'socar':
+
+    if env == 'ubuntu':
+        base_path = './'
+
+    else:
+        base_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset'
+
+    img_dir_path = os.path.join(base_path, 'damaged_car_images/')
+    label_dir_path = os.path.join(base_path, 'bbox_labels/')
+
+    #img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
+    #label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
+    #if env == 'ubuntu':
+    #    img_dir_path = './damaged_car_images/' #path of the image
+    #    label_dir_path = './bbox_labels/' #path of the label
+
+elif dataset_type == 'neokt':
+    
+    if env == 'ubuntu':
+        base_path = './'
+
+    else:
+        base_path = '/Users/kp/Desktop/work/scratch_detection/car-damage-dataset'
+    
+    if task == 'is_damage':
+        img_dir_path = os.path.join(base_path, 'is_damage_dataset')
+
+    elif task == 'severity':
+        img_dir_path = os.path.join(base_path, 'damage_severity_dataset')
+
+    elif task == 'which_pose':
+        img_dir_path = os.path.join(base_path, 'pose_dataset')
+
 
 # img - label pair checker
-def dataset_pair_checker(img_dir_path, label_dir_path):
+def _dataset_pair_checker(img_dir_path, label_dir_path):
     
     error_img_container = list() # A container which holds the name of unmatched img-label
 
@@ -110,23 +143,101 @@ def read_label(label_dir_path, task):
     print(label_container.shape)
     return label_container
 
+def create_label(img_dir_path, task):
+    pass
+
+
 # 0. read image and labels
-images = read_img(img_dir_path)
-labels = read_label(label_dir_path, is_damage)
-print('>> Images are: ', images.shape)
-print('>> Labels are: ', labels.shape)
+if dataset_type == 'socar':
+    images = read_img(img_dir_path)
+    labels = read_label(label_dir_path, 'is_damage')
 
-train_x, test_x, train_y, test_y = train_test_split(
-    images, labels,
-    test_size = 0.2,
-    random_state = 40
-)
+    train_x, test_x, train_y, test_y = train_test_split(
+        images, labels,
+        test_size = 0.2,
+        random_state = 40
+    )
 
-train_x, val_x, train_y, val_y = train_test_split(
-    train_x, train_y,
-    test_size = 0.1,
-    random_state = 40
-)
+    train_x, val_x, train_y, val_y = train_test_split(
+        train_x, train_y,
+        test_size = 0.1,
+        random_state = 40
+    )
+
+elif dataset_type == 'neokt':
+    
+    if task == 'is_damage':
+        train_normal_path = os.path.join(img_dir_path, 'training', '01-whole')
+        train_damage_path = os.path.join(img_dir_path, 'training', '00-damage')
+        test_normal_path = os.path.join(img_dir_path, 'validation', '01-whole')
+        test_damage_path = os.path.join(img_dir_path, 'validation', '00-damage')
+
+        train_normal_img = read_img(train_normal_path)
+        train_damage_img = read_img(train_damage_path)
+        test_normal_img = read_img(train_normal_path)
+        test_damage_img = read_img(train_damage_path)
+
+        train_normal_label = np.zeros(len(train_normal_img))
+        train_damage_label = np.ones(len(train_damage_img))
+        test_normal_label = np.zeros(len(test_normal_img))
+        test_damage_label = np.zeros(len(test_damage_img))
+
+        print(len(train_normal_label))
+        print(len(train_damage_label))
+        print(len(test_normal_label))
+        print(len(test_damage_label))
+
+        train_x = np.concatenate((train_normal_img, train_damage_img), axis=0)
+        train_y = np.concatenate((train_normal_label, train_damage_label), axis=0)
+        test_x = np.concatenate((test_normal_img, test_damage_img), axis=0)
+        test_y = np.concatenate((test_normal_img, test_damage_img), axis=0)
+
+        train_x, val_x, train_y, val_y = train_test_split(
+            train_x, train_y,
+            test_size = 0.2,
+            random_state = 40
+        )
+
+    elif task == 'which_pose':
+        train_front_path = os.path.join(img_dir_path, 'training', '00-front')
+        train_rear_path = os.path.join(img_dir_path, 'training', '01-rear')
+        train_side_path = os.path.join(img_dir_path, 'training', '02-side')
+        test_front_path = os.path.join(img_dir_path, 'validation', '00-front')
+        test_rear_path = os.path.join(img_dir_path, 'validation', '01-rear')
+        test_side_path = os.path.join(img_dir_path, 'validation', '02-side')
+
+        train_front_img = read_img(train_front_path)
+        train_rear_img = read_img(train_rear_path)
+        train_side_img = read_img(train_side_path)
+        test_front_img = read_img(test_front_path)
+        test_rear_img = read_img(test_rear_path)
+        test_side_img = read_img(test_side_path)
+
+        train_front_label = np.full((len(train_front_img), ), 0) # front
+        train_rear_label = np.full((len(train_rear_img), ), 1) #rear
+        train_side_label = np.full((len(train_side_img), ), 2) #side
+        test_front_label = np.full((len(test_front_img), ), 0) # front
+        test_rear_label = np.full((len(test_rear_img, ), ), 1) #rear
+        test_side_label = np.full((len(test_side_img, ), ), 2) #side
+
+        print(len(train_front_label))
+        print(len(train_rear_label))
+        print(len(train_side_label))
+        print(len(test_front_label))
+        print(len(test_rear_label))
+        print(len(test_side_label))
+
+        train_x = np.concatenate((train_front_img, train_rear_img, train_side_img), axis=0)
+        train_y = np.concatenate((train_front_label, train_rear_label, train_side_label), axis=0)
+
+        test_x = np.concatenate((test_front_img, test_rear_img, test_side_img), axis=0)
+        test_y = np.concatenate((test_front_label, test_rear_label, test_side_label), axis=0)
+
+        train_x, val_x, train_y, val_y = train_test_split(
+            train_x, train_y,
+            test_size = 0.2,
+            random_state = 40
+        )
 
 print('train_x: ', train_x.shape)
 print('val_x: ', val_x.shape)
@@ -146,9 +257,10 @@ if mode == 'train':
         )
 
     elif task == 'which_pose':
+
         classifier = transfer_learning_model(
             train_x, train_y, val_x, val_y, test_x, test_y,
-            num_class = 6,
+            num_class = 3,
             epoch=10,
             batch_size=100,
             model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2

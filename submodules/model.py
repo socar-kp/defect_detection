@@ -102,11 +102,15 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     '''
     y_pred = finetune_model.predict(test_x) #np.argmax
     y_pred = np.argmax(y_pred)
+    print('>> Predicted Results')
     print(y_pred)
-    print(type(y_pred))
+    
+    test_y = np.argmax(test_y)
+    print('>> Ground Truth')
+    print(test_y)
 
     accuracy = accuracy_score(test_y, y_pred)
-    precision, recall, f1_score = precision_recall_fscore_support(test_y, y_pred)
+    precision, recall, f1_score, _ = precision_recall_fscore_support(test_y, y_pred, 'micro')
     
     print(">> Test Performance <<")
     print('Acc: ', accuracy)
