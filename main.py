@@ -20,8 +20,8 @@ from submodules.model import *
 reshape_size = (224,224)
 task = 'which_pose' #'which_pose'
 mode = 'train'
-env = 'ubuntu'
-model_type = 'vgg16' #vgg16, resnet_50, xception, inception_v3
+env = 'mac'
+model_type = 'mobilenet' #mobilenet, vgg16, resnet_50, xception, inception_v3
 dataset_type = 'neokt' #socar
 
 print('>> Task: ', task)
@@ -31,7 +31,7 @@ print('>> Dataset: ', dataset_type)
 if dataset_type == 'socar':
 
     if env == 'ubuntu':
-        base_path = './'
+        base_path = '../'
 
     else:
         base_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset'
@@ -48,7 +48,7 @@ if dataset_type == 'socar':
 elif dataset_type == 'neokt':
     
     if env == 'ubuntu':
-        base_path = './'
+        base_path = '../'
 
     else:
         base_path = '/Users/kp/Desktop/work/scratch_detection/car-damage-dataset'
@@ -253,7 +253,9 @@ if mode == 'train':
             epoch=10,
             batch_size=100,
             model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2
-            reshape_size=reshape_size
+            reshape_size=reshape_size,
+            l1_weight = 0.00001,
+            l2_weight = 0.00001
         )
 
     elif task == 'which_pose':
@@ -264,7 +266,9 @@ if mode == 'train':
             epoch=10,
             batch_size=100,
             model_type=model_type, #vgg_16, resnet_50, xception, inception_v3, mobilenet_v2
-            reshape_size=reshape_size
+            reshape_size=reshape_size,
+            l1_weight = 0.00001,
+            l2_weight = 0.00001
         )
 
 
