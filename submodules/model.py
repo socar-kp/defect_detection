@@ -97,7 +97,11 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     )
 
     # Test Performance
+    '''
+    TODO: Result 해결하는데 이슈가 있음 ### !
+    '''
     y_pred = finetune_model.predict(test_x) #np.argmax
+    y_pred = np.argmax(y_pred)
     print(y_pred)
     print(type(y_pred))
 
