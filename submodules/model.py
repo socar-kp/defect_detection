@@ -8,6 +8,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras import optimizers, initializers, regularizers, metrics
 from keras.callbacks import ModelCheckpoint
 from keras import regularizers
+from keras.layers import BatchNormalization, Activation
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
@@ -33,7 +34,8 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     # change label into one hot
     train_y = keras.utils.to_categorical(train_y, num_classes=num_class)
     val_y = keras.utils.to_categorical(val_y, num_classes=num_class)
-    test_y = keras.utils.to_categorical(test_y, num_classes=num_class)
+    #test_y = keras.utils.to_categorical(test_y, num_classes=num_class)
+    print(test_y)
 
     if model_type == 'vgg16':
         pre_trained = VGG16(
@@ -80,27 +82,32 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     else:
         finetune_model.add(layers.Flatten())
 
-    finetune_model.add(layers.Dense(num_class*128, activation='relu',
+    finetune_model.add(layers.Dense(num_class*128,# activation='relu',
         kernel_regularizer=regularizers.l1_l2(
             l1=l1_weight,
             l2=l2_weight)
         ))
-    
+    finetune_model.add(BatchNormalization())
+    finetune_model.add(Activation('relu'))
     #finetune_model.add(layers.Dense(num_class*64, activation='relu'))
     
-    finetune_model.add(layers.Dense(num_class*32, activation='relu',
+    finetune_model.add(layers.Dense(num_class*32,# activation='relu',
         kernel_regularizer=regularizers.l1_l2(
                 l1=l1_weight,
                 l2=l2_weight)
         ))
+    finetune_model.add(BatchNormalization())
+    finetune_model.add(Activation('relu'))
     
     #finetune_model.add(layers.Dense(num_class*16, activation='relu'))
     
-    finetune_model.add(layers.Dense(num_class*8, activation='relu',
+    finetune_model.add(layers.Dense(num_class*8,# activation='relu',
         kernel_regularizer=regularizers.l1_l2(
                     l1=l1_weight,
                     l2=l2_weight)    
         ))
+    finetune_model.add(BatchNormalization())
+    finetune_model.add(Activation('relu'))
     
     finetune_model.add(layers.Dense(num_class, activation='softmax')) # Final Activation
 
@@ -125,12 +132,12 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     '''
     TODO: Result 해결하는데 이슈가 있음 ### !
     '''
-    y_pred = finetune_model.predict(test_x, axis=1) #np.argmax
-    y_pred = np.argmax(y_pred)
+    y_pred = finetune_model.predict(test_x) #np.argmax
+    y_pred = np.argmax(y_pred, axis=1)
     print('>> Predicted Results')
     print(y_pred)
     
-    test_y = np.argmax(test_y, axis=1)
+    test_y = np.argmax(test_y, axis=0)
     print('>> Ground Truth')
     print(test_y)
 

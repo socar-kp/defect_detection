@@ -48,7 +48,7 @@ if dataset_type == 'socar':
 elif dataset_type == 'neokt':
     
     if env == 'ubuntu':
-        base_path = '../'
+        base_path = '../car-damage-dataset/'
 
     else:
         base_path = '/Users/kp/Desktop/work/scratch_detection/car-damage-dataset'
