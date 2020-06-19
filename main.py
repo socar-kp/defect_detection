@@ -18,10 +18,10 @@ from submodules.model import *
 '''
 
 reshape_size = (224,224)
-task = 'which_pose' #'which_pose'
+task = 'is_damage' #'which_pose'
 mode = 'train'
 env = 'mac'
-model_type = 'mobilenet' #mobilenet, vgg16, resnet_50, xception, inception_v3
+model_type = 'vgg16' #mobilenet, vgg16, resnet_50, xception, inception_v3
 dataset_type = 'neokt' #socar
 
 print('>> Task: ', task)
@@ -38,12 +38,6 @@ if dataset_type == 'socar':
 
     img_dir_path = os.path.join(base_path, 'damaged_car_images/')
     label_dir_path = os.path.join(base_path, 'bbox_labels/')
-
-    #img_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/damaged_car_images/' #path of the image
-    #label_dir_path = '/Users/kp/Desktop/work/scratch_detection/socar_dataset/bbox_labels/' #path of the label
-    #if env == 'ubuntu':
-    #    img_dir_path = './damaged_car_images/' #path of the image
-    #    label_dir_path = './bbox_labels/' #path of the label
 
 elif dataset_type == 'neokt':
     
@@ -190,7 +184,7 @@ elif dataset_type == 'neokt':
         train_x = np.concatenate((train_normal_img, train_damage_img), axis=0)
         train_y = np.concatenate((train_normal_label, train_damage_label), axis=0)
         test_x = np.concatenate((test_normal_img, test_damage_img), axis=0)
-        test_y = np.concatenate((test_normal_img, test_damage_img), axis=0)
+        test_y = np.concatenate((test_normal_label, test_damage_label), axis=0)
 
         train_x, val_x, train_y, val_y = train_test_split(
             train_x, train_y,
@@ -242,6 +236,9 @@ elif dataset_type == 'neokt':
 print('train_x: ', train_x.shape)
 print('val_x: ', val_x.shape)
 print('test_x: ', test_x.shape)
+print('train_y: ', train_y.shape)
+print('val_y: ', val_y.shape)
+print('test_y: ', test_y.shape)
 
 #1. Train Mode?
 if mode == 'train':
@@ -270,8 +267,6 @@ if mode == 'train':
             l1_weight = 0.00001,
             l2_weight = 0.00001
         )
-
-
 
 
 #2. Inference Mode?
