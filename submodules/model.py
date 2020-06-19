@@ -137,7 +137,7 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     print('>> Predicted Results')
     print(y_pred)
     
-    test_y = np.argmax(test_y, axis=1)
+    #test_y = np.argmax(test_y, axis=1)
     print('>> Ground Truth')
     print(test_y)
 

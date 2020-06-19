@@ -174,7 +174,7 @@ elif dataset_type == 'neokt':
         train_normal_label = np.zeros(len(train_normal_img))
         train_damage_label = np.ones(len(train_damage_img))
         test_normal_label = np.zeros(len(test_normal_img))
-        test_damage_label = np.zeros(len(test_damage_img))
+        test_damage_label = np.ones(len(test_damage_img))
 
         print(len(train_normal_label))
         print(len(train_damage_label))
