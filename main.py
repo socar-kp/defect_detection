@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 import tensorflow as tf
 import keras
-from keras.applications.vgg16 import preprocess_input
 
 import os
 import json
@@ -82,7 +81,7 @@ def _dataset_pair_checker(img_dir_path, label_dir_path):
         return True
 
 # read img 
-def read_img(img_dir_path):
+def read_img(img_dir_path, model_type):
     
     img_container = list()
     img_file_names = os.listdir(img_dir_path)
@@ -93,7 +92,17 @@ def read_img(img_dir_path):
         #read image
         img = cv2.imread(os.path.join(img_dir_path, img_file_name))[:,:,::-1] #read as RGB
         img = img.astype(np.float32)
-        img = preprocess_input(img)
+
+        if model_type == 'vgg16':
+            from keras.applications.vgg16 import preprocess_input
+            img = preprocess_input(img)
+
+        elif model_type == 'resnet_50':
+            from keras.applications.resnet50 import preprocess_input
+            img = preprocess_input(img)
+
+        else:
+            img = img / 255.0
 
         #image resizing
         resized_img = cv2.resize(img, dsize=reshape_size, interpolation=cv2.INTER_CUBIC)
