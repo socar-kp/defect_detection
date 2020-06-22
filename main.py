@@ -153,7 +153,7 @@ def read_label(label_dir_path, task):
 
 # 0. read image and labels
 if dataset_type == 'socar':
-    images = read_img(img_dir_path)
+    images = read_img(img_dir_path, model_type)
     labels = read_label(label_dir_path, 'is_damage')
 
     train_x, test_x, train_y, test_y = train_test_split(
@@ -176,10 +176,10 @@ elif dataset_type == 'neokt':
         test_normal_path = os.path.join(img_dir_path, 'validation', '01-whole')
         test_damage_path = os.path.join(img_dir_path, 'validation', '00-damage')
 
-        train_normal_img = read_img(train_normal_path)
-        train_damage_img = read_img(train_damage_path)
-        test_normal_img = read_img(train_normal_path)
-        test_damage_img = read_img(train_damage_path)
+        train_normal_img = read_img(train_normal_path, model_type)
+        train_damage_img = read_img(train_damage_path, model_type)
+        test_normal_img = read_img(train_normal_path, model_type)
+        test_damage_img = read_img(train_damage_path, model_type)
 
         train_normal_label = np.zeros(len(train_normal_img))
         train_damage_label = np.ones(len(train_damage_img))
@@ -211,13 +211,13 @@ elif dataset_type == 'neokt':
         test_rear_path = os.path.join(img_dir_path, 'validation', '01-rear')
         test_side_path = os.path.join(img_dir_path, 'validation', '02-side')
 
-        train_front_img = read_img(train_front_path)
-        train_rear_img = read_img(train_rear_path)
-        train_side_img = read_img(train_side_path)
+        train_front_img = read_img(train_front_path, model_type)
+        train_rear_img = read_img(train_rear_path, model_type)
+        train_side_img = read_img(train_side_path, model_type)
         
-        test_front_img = read_img(test_front_path)
-        test_rear_img = read_img(test_rear_path)
-        test_side_img = read_img(test_side_path)
+        test_front_img = read_img(test_front_path, model_type)
+        test_rear_img = read_img(test_rear_path, model_type)
+        test_side_img = read_img(test_side_path, model_type)
 
         train_front_label = np.full((len(train_front_img), ), 0) # front
         train_rear_label = np.full((len(train_rear_img), ), 1) #rear
