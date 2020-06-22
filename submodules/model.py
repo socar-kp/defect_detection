@@ -1,7 +1,7 @@
 import keras
 
 from keras import models, layers
-from keras.applications import VGG16, ResNet50, Xception, InceptionV3, MobileNet
+from keras.applications import VGG16, VGG19, ResNet50, ResNet101, Xception, InceptionV3, MobileNet
 from keras import Input
 from keras.models import Model
 from keras.preprocessing.image import ImageDataGenerator
@@ -45,9 +45,25 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
         )
         pre_trained.trainable = False  # False if we want to freeze the weight
 
-    elif model_type == 'resnet_50':
+    elif model_type == 'vgg19':
+        pre_trained = VGG19(
+            weights='imagenet',
+            include_top=False,
+            input_shape=reshape_size+ (3,)
+        )
+
+    elif model_type == 'resnet101':
+        pre_trained = ResNet101(
+            weights='imagenet',
+            include_top = False
+            input_shape = reshape_size + (3,)
+        )
+
+    elif model_type == 'resnet50':
         pre_trained = ResNet50(
             weights='imagenet'
+            include_top = False,
+            input_shape = reshape_size + (3,)
         )
 
     elif model_type == 'xception':
@@ -76,7 +92,7 @@ def transfer_learning_model(train_x, train_y, val_x, val_y, test_x, test_y, num_
     finetune_model = models.Sequential()
     finetune_model.add(pre_trained)
     
-    if model_type == 'resnet_50':
+    if model_type == 'resnet50':
         pass
 
     else:

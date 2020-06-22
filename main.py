@@ -22,8 +22,8 @@ from submodules.model import *
 reshape_size = (224,224)
 task = 'which_pose' #'which_pose'
 mode = 'train'
-env = 'mac'
-model_type = 'vgg16' #mobilenet, vgg16, resnet_50, xception, inception_v3
+env = 'ubuntu'
+model_type = 'vgg16' #mobilenet, vgg16, vgg19, resnet50, resnet101, xception, inception_v3
 dataset_type = 'neokt' #socar
 
 print('>> Task: ', task)
@@ -95,6 +95,10 @@ def read_img(img_dir_path, model_type):
 
         if model_type == 'vgg16':
             from keras.applications.vgg16 import preprocess_input
+            img = preprocess_input(img)
+
+        elif model_type == 'vgg19':
+            from keras.applications.vgg19 import preprocess_input
             img = preprocess_input(img)
 
         elif model_type == 'resnet_50':
