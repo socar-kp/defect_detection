@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import tensorflow as tf
+import keras
+from keras.applications.vgg16 import preprocess_input
 
 import os
 import json
@@ -11,6 +13,7 @@ import cv2
 from sklearn.model_selection import train_test_split
 from submodules.model import *
 
+
 '''
 1. Read Dataset
 * number of imgs = 2000 (.DS_Store --> erased)
@@ -18,7 +21,7 @@ from submodules.model import *
 '''
 
 reshape_size = (224,224)
-task = 'is_damage' #'which_pose'
+task = 'which_pose' #'which_pose'
 mode = 'train'
 env = 'mac'
 model_type = 'vgg16' #mobilenet, vgg16, resnet_50, xception, inception_v3
@@ -88,11 +91,13 @@ def read_img(img_dir_path):
     for img_file_name in img_file_names:
         
         #read image
-        img = cv2.imread(os.path.join(img_dir_path, img_file_name))[:,:,::-1]/255 #read as RGB
+        img = cv2.imread(os.path.join(img_dir_path, img_file_name))[:,:,::-1] #read as RGB
+        img = img.astype(np.float32)
+        img = preprocess_input(img)
 
         #image resizing
         resized_img = cv2.resize(img, dsize=reshape_size, interpolation=cv2.INTER_CUBIC)
-
+        
         img_container.append(resized_img)
 
         if idx % 200 == 0:
@@ -100,7 +105,7 @@ def read_img(img_dir_path):
         idx = idx + 1
 
     img_container = np.asarray(img_container)
-    #img_container = np.concatenate(img_container)
+
     print(img_container.shape)
 
     return img_container
@@ -136,10 +141,6 @@ def read_label(label_dir_path, task):
     print(np.unique(label_container))    
     print(label_container.shape)
     return label_container
-
-def create_label(img_dir_path, task):
-    pass
-
 
 # 0. read image and labels
 if dataset_type == 'socar':
@@ -196,6 +197,7 @@ elif dataset_type == 'neokt':
         train_front_path = os.path.join(img_dir_path, 'training', '00-front')
         train_rear_path = os.path.join(img_dir_path, 'training', '01-rear')
         train_side_path = os.path.join(img_dir_path, 'training', '02-side')
+
         test_front_path = os.path.join(img_dir_path, 'validation', '00-front')
         test_rear_path = os.path.join(img_dir_path, 'validation', '01-rear')
         test_side_path = os.path.join(img_dir_path, 'validation', '02-side')
@@ -203,6 +205,7 @@ elif dataset_type == 'neokt':
         train_front_img = read_img(train_front_path)
         train_rear_img = read_img(train_rear_path)
         train_side_img = read_img(train_side_path)
+        
         test_front_img = read_img(test_front_path)
         test_rear_img = read_img(test_rear_path)
         test_side_img = read_img(test_side_path)
